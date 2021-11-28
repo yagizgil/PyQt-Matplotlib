@@ -23,8 +23,10 @@ class Screen(QWidget):
         self.setUI()
 
     def setUI(self):
-        self.f = QFormLayout()
+        self.v = QVBoxLayout()
+        self.h = QHBoxLayout()
         
+        vv = QVBoxLayout()
         self.cb = QComboBox()
         self.cb.addItems(['Solarize_Light2',
                         '_classic_test_patch',
@@ -53,15 +55,18 @@ class Screen(QWidget):
                         'seaborn-whitegrid',
                         'tableau-colorblind10'])
         self.cb.currentIndexChanged.connect(self.change)
-        self.f.addRow(self.cb)
+        vv.addWidget(self.cb)
 
         self.ch = QCheckBox("Seaborn")
         self.ch.clicked.connect(self.setsea)
-        self.f.addRow(self.ch)
+        vv.addWidget(self.ch)
+        
 
         self.setGraph()
-
-        self.setLayout(self.f)
+        
+        self.v.addLayout(vv)
+        self.v.addLayout(self.h)
+        self.setLayout(self.v)
 
     def change(self):
         plt.style.use(self.cb.currentText())
@@ -69,9 +74,11 @@ class Screen(QWidget):
 
     def setGraph(self):
         try:
-            self.f.removeRow(self.g)
+            for i in reversed(range(self.h.count())): 
+                self.h.itemAt(i).widget().setParent(None)
         except:
             pass
+        
         self.g = graph.GraphWidget()
 
         self.g.canvas.plot(self.x)
@@ -79,7 +86,7 @@ class Screen(QWidget):
         
         self.g.canvas.legend(["X Ekseni","Y Ekseni"],loc="best")
 
-        self.f.addRow(self.g)
+        self.h.addWidget(self.g)
 
     def setsea(self):
         if self.ch.isChecked():
